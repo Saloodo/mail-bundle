@@ -1,0 +1,17 @@
+services:
+  Saloodo\MailBundle\Sender:
+    public: true
+    arguments:
+        - '@Saloodo\MailBundle\Adapters\LoggerAdapter'
+        - '@event_dispatcher'
+  Saloodo\MailBundle\Adapters\SalesForceAdapter:
+    arguments:
+        - ''
+        - ''
+        - ''
+        - ''
+
+  Saloodo\MailBundle\Adapters\LoggerAdapter:
+      arguments:
+          - '@logger'
+
