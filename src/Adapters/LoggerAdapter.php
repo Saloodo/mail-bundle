@@ -10,6 +10,7 @@ use Saloodo\MailBundle\Contract\MessageInterface;
 class LoggerAdapter implements AdapterInterface
 {
     private $logger;
+    private $errors = [];
 
     public function __construct(LoggerInterface $logger)
     {
@@ -24,5 +25,10 @@ class LoggerAdapter implements AdapterInterface
         $this->logger->info("email logged!");
 
         return true;
+    }
+
+    public function getErrors() : array
+    {
+        return $this->errors;
     }
 }

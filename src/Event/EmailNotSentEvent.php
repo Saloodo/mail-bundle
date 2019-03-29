@@ -10,17 +10,17 @@ class EmailNotSentEvent extends Event
     const NAME = 'email.not_sent';
 
     private $email;
-    private $payload;
+    private $errors;
 
     /**
      * EmailNotSentEvent constructor.
      * @param MessageInterface $email
-     * @param array $payload
+     * @param array $errors
      */
-    public function __construct(MessageInterface $email, array $payload = [])
+    public function __construct(MessageInterface $email, array $errors = [])
     {
         $this->email = $email;
-        $this->payload = $payload;
+        $this->errors = $errors;
     }
 
     /**
@@ -34,8 +34,8 @@ class EmailNotSentEvent extends Event
     /**
      * @return array
      */
-    public function getPayload(): array
+    public function getErrors(): array
     {
-        return $this->payload;
+        return $this->errors;
     }
 }

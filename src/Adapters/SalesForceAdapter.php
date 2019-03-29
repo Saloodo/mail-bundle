@@ -17,6 +17,7 @@ class SalesForceAdapter implements AdapterInterface
     private $apiUrl;
     private $authApiUrl;
     private $cache;
+    private $errors = [];
 
     private $async = false;
 
@@ -44,6 +45,9 @@ class SalesForceAdapter implements AdapterInterface
     {
         $endpoint = sprintf('%s/messaging/v1/messageDefinitionSends/key:%s/send', $this->apiUrl, $email->getTemplateKey());
 
+        $accessToken = $this->fetchAccessToken();
+        if ($accessToken === '') return false;
+
         $options = [
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->fetchAccessToken(),
@@ -55,10 +59,19 @@ class SalesForceAdapter implements AdapterInterface
         try {
             $response = json_decode($this->client->post($endpoint, $options)->getBody()->getContents(), true);
         } catch (GuzzleException $exception) {
+            $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
             return false;
         }
 
         if ($response['responses'][0]['hasErrors'] === true) {
+            $errors = $response['responses'][0]['messageErrors'];
+            foreach ($errors as $error) {
+                $this->errors[] = sprintf('%s -- SalesforceError:: Error Code: %s Error Message: %s', 
+                    __METHOD__, 
+                    $error['messageErrorCode'], 
+                    $error['messageErrorStatus']
+                );
+            }
             return false;
         }
 
@@ -73,6 +86,7 @@ class SalesForceAdapter implements AdapterInterface
         try {
             $tokenCache = $this->cache->getItem('salesforce_token');
         } catch (\Psr\Cache\InvalidArgumentException $exception) {
+            $this->errors[] = __METHOD__ . ' -- InvalidArgumentException:: ' . $exception->getMessage();
             return '';
         }
 
@@ -93,10 +107,12 @@ class SalesForceAdapter implements AdapterInterface
         try {
             $response = json_decode($this->client->post($endpoint, $options)->getBody()->getContents(), true);
         } catch (GuzzleException $exception) {
+            $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
             return '';
         }
 
         if (!array_key_exists("accessToken", $response)) {
+            $this->errors[] = __METHOD__ . ' -- No accessToken returned from Salesforce';
             return '';
         }
 
@@ -136,5 +152,10 @@ class SalesForceAdapter implements AdapterInterface
         }
 
         return $payload;
+    }
+
+    public function getErrors() : array
+    {
+        return $this->errors;
     }
 }
