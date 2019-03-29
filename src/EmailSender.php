@@ -36,8 +36,8 @@ class EmailSender
 
             return true;
         }
-
-        $this->eventDispatcher->dispatch(EmailNotSentEvent::NAME, new EmailNotSentEvent($email));
+        
+        $this->eventDispatcher->dispatch(EmailNotSentEvent::NAME, new EmailNotSentEvent($email, $this->adapter->getErrors()));
 
         return false;
     }
