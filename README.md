@@ -1,4 +1,9 @@
 # Saloodo Mail Bundle
+
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Total Downloads][ico-downloads]][link-downloads]
+[![Build Status][ico-travis]][link-travis]
+
 Saloodo Mail Bundle is a small symfony bundle that provides a simple interface for e-mail sending.
 
 It currently supports only salesforce.
@@ -89,4 +94,17 @@ email.not_sent
 email.sent
 ```
 
+## License
+
+This package is open-sourced software licensed under the MIT license.
+
+[ico-version]: https://img.shields.io/packagist/v/saloodo/mail-bundle.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/saloodo/mail-bundle.svg?style=flat-square
+[ico-travis]: https://api.travis-ci.com/Saloodo/mail-bundle.svg?branch=master
+
+
+[link-packagist]: https://packagist.org/packages/saloodo/mail-bundle
+[link-downloads]: https://packagist.org/packages/saloodo/mail-bundle
+[link-travis]: https://travis-ci.org/saloodo/mail-bundle
+[link-contributors]: ../../contributors]
 
