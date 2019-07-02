@@ -66,9 +66,9 @@ class SalesForceAdapter implements AdapterInterface
         if ($response['responses'][0]['hasErrors'] === true) {
             $errors = $response['responses'][0]['messageErrors'];
             foreach ($errors as $error) {
-                $this->errors[] = sprintf('%s -- SalesforceError:: Error Code: %s Error Message: %s', 
-                    __METHOD__, 
-                    $error['messageErrorCode'], 
+                $this->errors[] = sprintf('%s -- SalesforceError:: Error Code: %s Error Message: %s',
+                    __METHOD__,
+                    $error['messageErrorCode'],
                     $error['messageErrorStatus']
                 );
             }
@@ -136,7 +136,7 @@ class SalesForceAdapter implements AdapterInterface
             [
                 'To' => [
                     'Address' => $message->getRecipient()->getEmail(),
-                    'SubscriberKey' => $message->getRecipient()->getEmail(),
+                    'SubscriberKey' => $message->getRecipient()->getUniqueId() ?? $message->getRecipient()->getEmail(),
                     'ContactAttributes' => [
                         'SubscriberAttributes' => $emailData
                     ]
@@ -154,7 +154,7 @@ class SalesForceAdapter implements AdapterInterface
         return $payload;
     }
 
-    public function getErrors() : array
+    public function getErrors(): array
     {
         return $this->errors;
     }

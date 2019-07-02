@@ -4,48 +4,37 @@ namespace Saloodo\MailBundle;
 
 class Party
 {
+    /** @var string */
     private $email;
+
+    /** @var string */
     private $name;
 
-    public function __construct(string $email, string $name)
+    /** @var string|null */
+    private $uniqueId;
+
+    public function __construct(string $email, string $name = null, string $uniqueId = null)
     {
         $this->email = $email;
         $this->name = $name;
+        $this->uniqueId = $uniqueId;
     }
 
-    /**
-     * @return string
-     */
     public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * @param string $email
-     * @return Party
-     */
-    public function setEmail(string $email): Party
-    {
-        $this->email = $email;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * @param string $name
-     * @return Party
+     * @return null|string
      */
-    public function setName(string $name): Party
+    public function getUniqueId(): ?string
     {
-        $this->name = $name;
-        return $this;
+        return $this->uniqueId;
     }
 }
