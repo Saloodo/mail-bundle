@@ -22,11 +22,12 @@ abstract class AbstractEmail implements MessageInterface
     /**
      * @param string $email
      * @param string|null $name
+     * @param string|null $uniqueId
      * @return $this
      */
-    public function setRecipient(string $email, string $name = null)
+    public function setRecipient(string $email, string $name = null, string $uniqueId = null)
     {
-        $this->recipient = new Party($email, $name);
+        $this->recipient = new Party($email, $name, $uniqueId);
 
         return $this;
     }
