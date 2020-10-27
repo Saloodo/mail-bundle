@@ -22,7 +22,7 @@ class LoggerAdapter implements AdapterInterface
      */
     public function send(MessageInterface $email): bool
     {
-        $this->logger->info("email logged!");
+        $this->logger->info("Email sent", $email);
 
         return true;
     }
