@@ -22,16 +22,27 @@ class LoggerAdapter implements AdapterInterface
      */
     public function send(MessageInterface $email): bool
     {
-        $this->logger->info("Email sent", [
-            'email_type' => get_class($email),
-            'sender' => $email->getSender()->getName() . '<'. $email->getSender()->getEmail() . '>',
-            'rcpt' => $email->getRecipient()->getName() . '<'. $email->getSender()->getEmail() . '>'
-        ]);
+        $this->logger->info(
+            "Email sent to the logs",
+            [
+                'To' => [
+                    'Address' => $email->getRecipient()->getEmail(),
+                    'SubscriberKey' => $email->getRecipient()->getUniqueId() ?? $email->getRecipient()->getEmail(),
+                    'ContactAttributes' => [
+                        'SubscriberAttributes' => $email->getPayload()
+                    ]
+                ],
+                'From' => [
+                    'Address' => $email->getSender()->getEmail(),
+                    'Name' => $email->getSender()->getName(),
+                ],
+            ]
+        );
 
         return true;
     }
 
-    public function getErrors() : array
+    public function getErrors(): array
     {
         return $this->errors;
     }
