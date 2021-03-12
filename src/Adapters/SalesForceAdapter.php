@@ -52,7 +52,7 @@ class SalesForceAdapter implements AdapterInterface
             'headers' => [
                 'Authorization' => 'Bearer ' . $this->fetchAccessToken(),
             ],
-            'timeout' => 5, // in seconds
+            'timeout' => 1, // in seconds
             'json' => $this->getFullPayload($email, $email->getPayload()),
         ];
 
