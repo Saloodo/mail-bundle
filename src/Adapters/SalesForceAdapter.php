@@ -72,7 +72,7 @@ class SalesForceAdapter implements AdapterInterface
                     $response = json_decode($response->getBody()->getContents(), true);
                     if (!array_key_exists("accessToken", $response)) {
                         $this->errors[] = __METHOD__ . ' -- No accessToken returned from Salesforce';
-                        return null;
+                        return false;
                     }
 
                     $tokenCache->set($response['accessToken']);
@@ -82,6 +82,10 @@ class SalesForceAdapter implements AdapterInterface
 
                     $accessToken =  $response['accessToken'];
                     return $this->sendEmail($accessToken, $email);
+                },
+                function (RequestException $exception) {
+                    $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
+                    return false;
                 }
             );
         } catch (GuzzleException $exception) {
