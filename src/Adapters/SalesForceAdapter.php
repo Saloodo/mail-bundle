@@ -123,11 +123,13 @@ class SalesForceAdapter implements AdapterInterface
                                 $error['messageErrorStatus']
                             );
                         }
-                        return null;
+                        return false;
                     }
+                    return true;
                 },
                 function (RequestException $exception) {
                     $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
+                    return false;
                 }
             );
         } catch (GuzzleException $exception) {
