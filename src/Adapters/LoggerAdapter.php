@@ -3,6 +3,7 @@
 namespace Saloodo\MailBundle\Adapters;
 
 
+use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Log\LoggerInterface;
 use Saloodo\MailBundle\Contract\AdapterInterface;
 use Saloodo\MailBundle\Contract\MessageInterface;
@@ -20,7 +21,7 @@ class LoggerAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function send(MessageInterface $email): bool
+    public function send(MessageInterface $email): ?PromiseInterface
     {
         $this->logger->info(
             "Email sent to the logs",
@@ -39,7 +40,7 @@ class LoggerAdapter implements AdapterInterface
             ]
         );
 
-        return true;
+        return null;
     }
 
     public function getErrors(): array

@@ -3,13 +3,15 @@
 namespace Saloodo\MailBundle\Contract;
 
 
+use GuzzleHttp\Promise\PromiseInterface;
+
 interface AdapterInterface
 {
     /**
      * @param MessageInterface $email
-     * @return bool
+     * @return PromiseInterface|null
      */
-    public function send(MessageInterface $email): bool;
+    public function send(MessageInterface $email): ?PromiseInterface;
 
     /**
      * @return array
