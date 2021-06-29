@@ -3,6 +3,7 @@
 namespace Saloodo\MailBundle\Adapters;
 
 
+use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Log\LoggerInterface;
 use Saloodo\MailBundle\Contract\AdapterInterface;
@@ -40,7 +41,7 @@ class LoggerAdapter implements AdapterInterface
             ]
         );
 
-        return null;
+        return new FulfilledPromise(true);
     }
 
     public function getErrors(): array
