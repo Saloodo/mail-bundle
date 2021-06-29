@@ -43,6 +43,6 @@ class EmailSender
 
         $this->eventDispatcher->dispatch(EmailNotSentEvent::NAME, new EmailNotSentEvent($email, $this->adapter->getErrors()));
 
-        return new RejectedPromise('unknown error please check logs');
+        return $promise;
     }
 }
