@@ -4,6 +4,7 @@ namespace Saloodo\MailBundle;
 
 
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectedPromise;
 use Saloodo\MailBundle\Contract\AdapterInterface;
 use Saloodo\MailBundle\Contract\MessageInterface;
 use Saloodo\MailBundle\Event\EmailNotSentEvent;
@@ -28,9 +29,9 @@ class EmailSender
 
     /**
      * @param MessageInterface $email
-     * @return PromisorInterface|null
+     * @return PromiseInterface
      */
-    public function send(MessageInterface $email): ?PromiseInterface
+    public function send(MessageInterface $email): PromiseInterface
     {
         $promise = $this->adapter->send($email);
 
@@ -42,6 +43,6 @@ class EmailSender
 
         $this->eventDispatcher->dispatch(EmailNotSentEvent::NAME, new EmailNotSentEvent($email, $this->adapter->getErrors()));
 
-        return null;
+        return new RejectedPromise('unknown error please check logs');
     }
 }

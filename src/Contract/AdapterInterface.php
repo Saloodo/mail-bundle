@@ -9,9 +9,9 @@ interface AdapterInterface
 {
     /**
      * @param MessageInterface $email
-     * @return PromiseInterface|null
+     * @return PromiseInterface
      */
-    public function send(MessageInterface $email): ?PromiseInterface;
+    public function send(MessageInterface $email): PromiseInterface;
 
     /**
      * @return array

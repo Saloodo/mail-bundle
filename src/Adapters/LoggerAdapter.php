@@ -22,7 +22,7 @@ class LoggerAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function send(MessageInterface $email): ?PromiseInterface
+    public function send(MessageInterface $email): PromiseInterface
     {
         $this->logger->info(
             "Email sent to the logs",

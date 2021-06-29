@@ -6,6 +6,7 @@ namespace Saloodo\MailBundle\Adapters;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectedPromise;
 use Saloodo\MailBundle\Contract\AdapterInterface;
 use Saloodo\MailBundle\Contract\MessageInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface as Cache;
@@ -42,13 +43,14 @@ class SalesForceAdapter implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function send(MessageInterface $email): ?PromiseInterface
+    public function send(MessageInterface $email): PromiseInterface
     {
         try {
             $tokenCache = $this->cache->getItem('salesforce_token');
         } catch (\Psr\Cache\InvalidArgumentException $exception) {
-            $this->errors[] = __METHOD__ . ' -- InvalidArgumentException:: ' . $exception->getMessage();
-            return null;
+            $message = __METHOD__ . ' -- InvalidArgumentException:: ' . $exception->getMessage();
+            $this->errors[] = $message;
+            return new RejectedPromise($message);
         }
 
         if ($tokenCache->isHit()) {
@@ -71,8 +73,9 @@ class SalesForceAdapter implements AdapterInterface
                 function (ResponseInterface $response) use ($tokenCache, $email) {
                     $response = json_decode($response->getBody()->getContents(), true);
                     if (!array_key_exists("accessToken", $response)) {
-                        $this->errors[] = __METHOD__ . ' -- No accessToken returned from Salesforce';
-                        return false;
+                        $message = __METHOD__ . ' -- No accessToken returned from Salesforce';
+                        $this->errors[] = $message;
+                        return new RejectedPromise($message);
                     }
 
                     $tokenCache->set($response['accessToken']);
@@ -82,17 +85,13 @@ class SalesForceAdapter implements AdapterInterface
 
                     $accessToken =  $response['accessToken'];
                     return $this->sendEmail($accessToken, $email);
-                },
-                function (RequestException $exception) {
-                    $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
-                    return false;
                 }
             );
         } catch (GuzzleException $exception) {
-            $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
-            return null;
+            $message = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
+            $this->errors[] = $message;
+            return new RejectedPromise($message);
         }
-        return null;
     }
 
     /**
@@ -100,11 +99,11 @@ class SalesForceAdapter implements AdapterInterface
      * @param MessageInterface $email
      * @return PromiseInterface|null : ?PromiseInterface
      */
-    private function sendEmail(string $accessToken, MessageInterface $email): ?PromiseInterface
+    private function sendEmail(string $accessToken, MessageInterface $email): PromiseInterface
     {
         $endpoint = sprintf('%s/messaging/v1/messageDefinitionSends/key:%s/send', $this->apiUrl, $email->getTemplateKey());
 
-        if ($accessToken === '') return null;
+        if ($accessToken === '') return new RejectedPromise('Access Token missing');
 
         $options = [
             'headers' => [
@@ -132,15 +131,16 @@ class SalesForceAdapter implements AdapterInterface
                     return true;
                 },
                 function (RequestException $exception) {
-                    $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
-                    return false;
+                    $message = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
+                    $this->errors[] = $message;
+                    return new RejectedPromise($message);
                 }
             );
         } catch (GuzzleException $exception) {
-            $this->errors[] = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
-            return null;
+            $message = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
+            $this->errors[] = $message;
+            return new RejectedPromise($message);
         }
-        return null;
     }
 
     /**
