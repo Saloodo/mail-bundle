@@ -3,7 +3,7 @@
 namespace Saloodo\MailBundle;
 
 
-use GuzzleHttp\Promise\PromisorInterface;
+use GuzzleHttp\Promise\PromiseInterface;
 use Saloodo\MailBundle\Contract\AdapterInterface;
 use Saloodo\MailBundle\Contract\MessageInterface;
 use Saloodo\MailBundle\Event\EmailNotSentEvent;
@@ -30,10 +30,11 @@ class EmailSender
      * @param MessageInterface $email
      * @return PromisorInterface|null
      */
-    public function send(MessageInterface $email): ?PromisorInterface
+    public function send(MessageInterface $email): ?PromiseInterface
     {
         $promise = $this->adapter->send($email);
-        if ($promise instanceof PromisorInterface) {
+
+        if ($promise) {
             $this->eventDispatcher->dispatch(EmailSentEvent::NAME, new EmailSentEvent($email));
 
             return $promise;
