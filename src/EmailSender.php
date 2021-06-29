@@ -35,7 +35,7 @@ class EmailSender
     {
         $promise = $this->adapter->send($email);
 
-        if ($promise) {
+        if (!$promise instanceof RejectedPromise) {
             $this->eventDispatcher->dispatch(EmailSentEvent::NAME, new EmailSentEvent($email));
 
             return $promise;
