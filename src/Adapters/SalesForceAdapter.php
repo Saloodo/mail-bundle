@@ -23,7 +23,9 @@ class SalesForceAdapter implements AdapterInterface
     private $cache;
     private $errors = [];
 
-    private $async = false;
+    private $async = true;
+
+    const TIMEOUT = 60;
 
     /**
      * SalesForceAdapter constructor.
@@ -59,18 +61,8 @@ class SalesForceAdapter implements AdapterInterface
             return $this->sendEmail($tokenCache->get(), $email);
         }
 
-        $endpoint = sprintf('%s/v1/requestToken', $this->authApiUrl);
-
-        $options = [
-            'timeout' => 60, // in seconds
-            'json' => [
-                'clientId' => $this->id,
-                'clientSecret' => $this->secret
-            ],
-        ];
-
         try {
-            return $this->client->postAsync($endpoint, $options)->then(
+            return $this->fetchAccessToken()->then(
                 function (ResponseInterface $response) use ($tokenCache, $email) {
                     $response = json_decode($response->getBody()->getContents(), true);
                     if (!array_key_exists("accessToken", $response)) {
@@ -86,6 +78,11 @@ class SalesForceAdapter implements AdapterInterface
 
                     $accessToken =  $response['accessToken'];
                     return $this->sendEmail($accessToken, $email);
+                },
+                function (RequestException $exception) {
+                    $message = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
+                    $this->errors[] = $message;
+                    return new RejectedPromise($message);
                 }
             );
         } catch (GuzzleException $exception) {
@@ -93,6 +90,24 @@ class SalesForceAdapter implements AdapterInterface
             $this->errors[] = $message;
             return new RejectedPromise($message);
         }
+    }
+
+    /**
+     * @return PromiseInterface
+     */
+    private function fetchAccessToken(): PromiseInterface
+    {
+        $endpoint = sprintf('%s/v1/requestToken', $this->authApiUrl);
+
+        $options = [
+            'timeout' => self::TIMEOUT, // in seconds
+            'json' => [
+                'clientId' => $this->id,
+                'clientSecret' => $this->secret
+            ],
+        ];
+
+        return $this->client->postAsync($endpoint, $options);
     }
 
     /**
@@ -110,7 +125,7 @@ class SalesForceAdapter implements AdapterInterface
             'headers' => [
                 'Authorization' => 'Bearer ' . $accessToken,
             ],
-            'timeout' => 60, // in seconds
+            'timeout' => self::TIMEOUT, // in seconds
             'json' => $this->getFullPayload($email, $email->getPayload()),
         ];
 
@@ -134,7 +149,7 @@ class SalesForceAdapter implements AdapterInterface
                 function (RequestException $exception) {
                     $message = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
                     $this->errors[] = $message;
-                    return new RejectedPromise($message);
+                    return false;
                 }
             );
         } catch (GuzzleException $exception) {
