@@ -181,7 +181,7 @@ class SalesForceAdapter implements AdapterInterface
         $payload =
             [
                 'To' => [
-                    'Address' => 'unnikrishnan.bhargav@saloodo.com',//$message->getRecipient()->getEmail(),
+                    'Address' => $message->getRecipient()->getEmail(),
                     'SubscriberKey' => $message->getRecipient()->getUniqueId() ?? $message->getRecipient()->getEmail(),
                     'ContactAttributes' => [
                         'SubscriberAttributes' => $emailData
