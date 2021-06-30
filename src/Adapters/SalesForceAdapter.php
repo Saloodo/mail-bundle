@@ -10,6 +10,8 @@ use GuzzleHttp\Promise\RejectedPromise;
 use Saloodo\MailBundle\Contract\AdapterInterface;
 use Saloodo\MailBundle\Contract\MessageInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface as Cache;
+use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Exception\RequestException;
 
 class SalesForceAdapter implements AdapterInterface
 {
@@ -54,8 +56,7 @@ class SalesForceAdapter implements AdapterInterface
         }
 
         if ($tokenCache->isHit()) {
-            $accessToken =  $tokenCache->get();
-            return $this->sendEmail($accessToken, $email);
+            return $this->sendEmail($tokenCache->get(), $email);
         }
 
         $endpoint = sprintf('%s/v1/requestToken', $this->authApiUrl);
