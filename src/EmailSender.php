@@ -3,42 +3,29 @@
 namespace Saloodo\MailBundle;
 
 
+use GuzzleHttp\Promise\PromiseInterface;
 use Saloodo\MailBundle\Contract\AdapterInterface;
 use Saloodo\MailBundle\Contract\MessageInterface;
-use Saloodo\MailBundle\Event\EmailNotSentEvent;
-use Saloodo\MailBundle\Event\EmailSentEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EmailSender
 {
     private $adapter;
-    private $eventDispatcher;
 
     /**
      * Sender constructor.
      * @param AdapterInterface $adapter
-     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(AdapterInterface $adapter, EventDispatcherInterface $eventDispatcher)
+    public function __construct(AdapterInterface $adapter)
     {
         $this->adapter = $adapter;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * @param MessageInterface $email
-     * @return bool
+     * @return PromiseInterface
      */
-    public function send(MessageInterface $email): bool
+    public function send(MessageInterface $email): PromiseInterface
     {
-        if ($this->adapter->send($email)) {
-            $this->eventDispatcher->dispatch(EmailSentEvent::NAME, new EmailSentEvent($email));
-
-            return true;
-        }
-        
-        $this->eventDispatcher->dispatch(EmailNotSentEvent::NAME, new EmailNotSentEvent($email, $this->adapter->getErrors()));
-
-        return false;
+        return $this->adapter->send($email);
     }
 }

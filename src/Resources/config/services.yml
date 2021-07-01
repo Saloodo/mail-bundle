@@ -3,15 +3,14 @@ services:
     public: true
     arguments:
         - '@Saloodo\MailBundle\Adapters\LoggerAdapter'
-        - '@event_dispatcher'
   Saloodo\MailBundle\Adapters\SalesForceAdapter:
     arguments:
         - ''
         - ''
         - ''
         - ''
+        - '@event_dispatcher'
 
   Saloodo\MailBundle\Adapters\LoggerAdapter:
       arguments:
           - '@logger'
-
