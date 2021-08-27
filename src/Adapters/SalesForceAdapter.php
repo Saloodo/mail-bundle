@@ -29,7 +29,7 @@ class SalesForceAdapter implements AdapterInterface
 
     private $eventDispatcher;
 
-    const TIMEOUT = 60;
+    const TIMEOUT = 120; //recommended by SF support
 
     /**
      * SalesForceAdapter constructor.
