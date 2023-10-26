@@ -135,14 +135,25 @@ class SalesForceAdapter implements AdapterInterface
             return new RejectedPromise('Access Token missing');
         }
 
-        $options = [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Disposition' => 'inline',
-            ],
-            'timeout' => self::TIMEOUT, // in seconds
-            'json' => $this->getFullPayload($email, $email->getPayload()),
-        ];
+        if ($email->getPayload()['saloodo_invoice']) {
+            $options = [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Disposition: inline; filename="' . $email->getPayload()['saloodo_invoice'] . '"',
+                    'Content-type' => 'application/pdf'
+                ],
+                'timeout' => self::TIMEOUT, // in seconds
+                'json' => $this->getFullPayload($email, $email->getPayload()),
+            ];
+        } else {
+            $options = [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $accessToken,
+                ],
+                'timeout' => self::TIMEOUT, // in seconds
+                'json' => $this->getFullPayload($email, $email->getPayload()),
+            ];
+        }
 
         return $this->client->postAsync($endpoint, $options)->then(
             function (ResponseInterface $response) use ($email) {
