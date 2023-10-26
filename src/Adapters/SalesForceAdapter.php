@@ -157,6 +157,7 @@ class SalesForceAdapter implements AdapterInterface
 
         return $this->client->postAsync($endpoint, $options)->then(
             function (ResponseInterface $response) use ($email) {
+                $response->withHeader('Content-Disposition', 'inline');
                 $response = json_decode($response->getBody()->getContents(), true);
                 if ($response['responses'][0]['hasErrors'] === true) {
                     $errors = $response['responses'][0]['messageErrors'];
