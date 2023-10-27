@@ -145,11 +145,8 @@ class SalesForceAdapter implements AdapterInterface
 
         return $this->client->postAsync($endpoint, $options)->then(
             function (ResponseInterface $response) use ($email) {
+                $response->withHeader('Content-Disposition', 'inline');
                 $response = json_decode($response->getBody()->getContents(), true);
-                if ($email->getPayload()['saloodo_invoice']) {
-                    $response = $response->withHeader('Content-Disposition', 'inline; filename="' . $email->getPayload()['saloodo_invoice'] . '"');
-                    $response = $response->withHeader('Content-type', 'application/pdf');
-                }
                 if ($response['responses'][0]['hasErrors'] === true) {
                     $errors = $response['responses'][0]['messageErrors'];
                     foreach ($errors as $error) {
@@ -160,10 +157,10 @@ class SalesForceAdapter implements AdapterInterface
                         );
                     }
                     $this->eventDispatcher->dispatch(EmailNotSentEvent::NAME, new EmailNotSentEvent($email, $this->errors));
-                    return $response;
+                    return false;
                 }
                 $this->eventDispatcher->dispatch(EmailSentEvent::NAME, new EmailSentEvent($email));
-                return $response;
+                return true;
             },
             function (RequestException $exception) use ($email) {
                 $message = __METHOD__ . ' -- GuzzleException:: ' . $exception->getMessage();
